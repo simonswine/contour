@@ -21,6 +21,7 @@ import (
 	"time"
 
 	"github.com/envoyproxy/go-control-plane/envoy/api/v2"
+	envoy_auth_v2 "github.com/envoyproxy/go-control-plane/envoy/service/auth/v2"
 	"github.com/heptio/contour/internal/contour"
 	"github.com/heptio/contour/internal/metrics"
 	"github.com/prometheus/client_golang/prometheus"
@@ -197,6 +198,14 @@ func TestGRPC(t *testing.T) {
 				TypeUrl: routeType,
 			}
 			_, err := rds.FetchRoutes(ctx, req)
+			check(t, err)
+		},
+		"Check": func(t *testing.T, cc *grpc.ClientConn) {
+			a := envoy_auth_v2.NewAuthorizationClient(cc)
+			ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+			defer cancel()
+			req := &envoy_auth_v2.CheckRequest{}
+			_, err := a.Check(ctx, req)
 			check(t, err)
 		},
 	}

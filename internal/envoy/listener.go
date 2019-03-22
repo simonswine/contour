@@ -89,6 +89,17 @@ func HTTPConnectionManager(routename, accessLogPath string) listener.Filter {
 					}),
 					"http_filters": lv(
 						st(map[string]*types.Value{
+							"name": sv(util.ExternalAuthorization),
+							"config": st(map[string]*types.Value{
+								"grpc_service": st(map[string]*types.Value{
+									"envoy_grpc": st(map[string]*types.Value{
+										"cluster_name": sv("contour"),
+									}),
+									"timeout": sv("1s"),
+								}),
+							}),
+						}),
+						st(map[string]*types.Value{
 							"name": sv(util.Gzip),
 						}),
 						st(map[string]*types.Value{
