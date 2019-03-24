@@ -58,6 +58,8 @@ func (c *ctx) writeVertex(v dag.Vertex) {
 		fmt.Fprintf(c.w, `"%p" [shape=record, label="{tcpservice|%s/%s:%d}"]`+"\n", v, v.Namespace, v.Name, v.Port)
 	case *dag.TCPProxy:
 		fmt.Fprintf(c.w, `"%p" [shape=record, label="{tcpproxy}"]`+"\n", v)
+	case *dag.Authentication:
+		fmt.Fprintf(c.w, `"%p" [shape=record, label="{authentication|%s/%s}"]`+"\n", v, v.Namespace(), v.Name())
 	}
 }
 

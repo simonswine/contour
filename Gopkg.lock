@@ -63,6 +63,8 @@
     "envoy/config/overload/v2alpha",
     "envoy/config/ratelimit/v2",
     "envoy/config/trace/v2",
+    "envoy/service/auth/v2",
+    "envoy/service/auth/v2alpha",
     "envoy/service/load_stats/v2",
     "envoy/type",
     "envoy/type/matcher",
@@ -344,9 +346,21 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:5349d852ad4e8e8d4d410c29e4cebaf03eca4e7055cfee659c7dce144ef06af1"
+  name = "github.com/tg123/go-htpasswd"
+  packages = ["."]
+  pruneopts = ""
+  revision = "d38e564730bf0836b56dbbfba806ec000c720ef2"
+
+[[projects]]
+  branch = "master"
   digest = "1:237f78dc98975fe36424378555dd59d7b974759b5396ea315502d1837f1c1eda"
   name = "golang.org/x/crypto"
-  packages = ["ssh/terminal"]
+  packages = [
+    "bcrypt",
+    "blowfish",
+    "ssh/terminal",
+  ]
   pruneopts = ""
   revision = "c7b33c32a30bae9ba07d37eb4d86f1f8b0f644fb"
 
@@ -847,10 +861,13 @@
     "github.com/envoyproxy/go-control-plane/envoy/config/filter/accesslog/v2",
     "github.com/envoyproxy/go-control-plane/envoy/config/filter/network/tcp_proxy/v2",
     "github.com/envoyproxy/go-control-plane/envoy/config/metrics/v2",
+    "github.com/envoyproxy/go-control-plane/envoy/service/auth/v2",
+    "github.com/envoyproxy/go-control-plane/envoy/service/auth/v2alpha",
     "github.com/envoyproxy/go-control-plane/envoy/service/load_stats/v2",
     "github.com/envoyproxy/go-control-plane/envoy/type",
     "github.com/envoyproxy/go-control-plane/pkg/util",
     "github.com/evanphx/json-patch",
+    "github.com/gogo/googleapis/google/rpc",
     "github.com/gogo/protobuf/jsonpb",
     "github.com/gogo/protobuf/proto",
     "github.com/gogo/protobuf/types",
@@ -861,6 +878,7 @@
     "github.com/prometheus/client_golang/prometheus/promhttp",
     "github.com/prometheus/client_model/go",
     "github.com/sirupsen/logrus",
+    "github.com/tg123/go-htpasswd",
     "google.golang.org/grpc",
     "google.golang.org/grpc/codes",
     "google.golang.org/grpc/status",
@@ -875,6 +893,7 @@
     "k8s.io/apimachinery/pkg/runtime/serializer",
     "k8s.io/apimachinery/pkg/types",
     "k8s.io/apimachinery/pkg/util/intstr",
+    "k8s.io/apimachinery/pkg/util/runtime",
     "k8s.io/apimachinery/pkg/watch",
     "k8s.io/client-go/discovery",
     "k8s.io/client-go/discovery/fake",

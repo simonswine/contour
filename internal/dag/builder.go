@@ -42,11 +42,12 @@ type KubernetesCache struct {
 
 	mu sync.RWMutex
 
-	ingresses     map[meta]*v1beta1.Ingress
-	ingressroutes map[meta]*ingressroutev1.IngressRoute
-	secrets       map[meta]*v1.Secret
-	delegations   map[meta]*ingressroutev1.TLSCertificateDelegation
-	services      map[meta]*v1.Service
+	ingresses       map[meta]*v1beta1.Ingress
+	ingressroutes   map[meta]*ingressroutev1.IngressRoute
+	secrets         map[meta]*v1.Secret
+	delegations     map[meta]*ingressroutev1.TLSCertificateDelegation
+	services        map[meta]*v1.Service
+	authentications map[meta]*ingressroutev1.Authentication
 }
 
 // meta holds the name and namespace of a Kubernetes object.
@@ -96,6 +97,12 @@ func (kc *KubernetesCache) Insert(obj interface{}) {
 			kc.delegations = make(map[meta]*ingressroutev1.TLSCertificateDelegation)
 		}
 		kc.delegations[m] = obj
+	case *ingressroutev1.Authentication:
+		m := meta{name: obj.Name, namespace: obj.Namespace}
+		if kc.authentications == nil {
+			kc.authentications = make(map[meta]*ingressroutev1.Authentication)
+		}
+		kc.authentications[m] = obj
 
 	default:
 		// not an interesting object
@@ -165,9 +172,10 @@ func (b *Builder) Build() *DAG {
 type builder struct {
 	source *Builder
 
-	services  map[servicemeta]Service
-	secrets   map[meta]*Secret
-	listeners map[int]*Listener
+	services        map[servicemeta]Service
+	secrets         map[meta]*Secret
+	listeners       map[int]*Listener
+	authentications map[meta]*Authentication
 
 	orphaned map[meta]bool
 
@@ -346,6 +354,32 @@ func (b *builder) lookupSecureVirtualHost(name string) *SecureVirtualHost {
 		return svh
 	}
 	return svh.(*SecureVirtualHost)
+}
+
+func (b *builder) lookUpAuthentication(m meta) *Authentication {
+	if a, ok := b.authentications[m]; ok {
+		return a
+	}
+	auth, ok := b.source.authentications[m]
+	if !ok {
+		return nil
+	}
+	a := &Authentication{
+		Object: auth,
+	}
+	// lookup basic auth secret
+	if auth.Spec.Basic != nil {
+		secretMeta := m
+		secretMeta.name = auth.Spec.Basic.SecretRef.Name
+		if sec := b.lookupSecret(secretMeta); sec != nil {
+			a.BasicSecret = sec
+		}
+	}
+	if b.authentications == nil {
+		b.authentications = make(map[meta]*Authentication)
+	}
+	b.authentications[a.toMeta()] = a
+	return a
 }
 
 // listener returns a listener for the supplied port.
@@ -751,6 +785,13 @@ func (b *builder) processRoutes(ir *ingressroutev1.IngressRoute, prefixMatch str
 				if s := b.lookupHTTPService(m, intstr.FromInt(service.Port), service.Weight, service.Strategy, service.HealthCheck); s != nil {
 					r.addHTTPService(s)
 				}
+			}
+
+			if route.AuthenticationRef.Name != "" {
+				r.Authentication = b.lookUpAuthentication(meta{
+					namespace: ir.Namespace,
+					name:      route.AuthenticationRef.Name,
+				})
 			}
 
 			b.lookupVirtualHost(host).addRoute(r)

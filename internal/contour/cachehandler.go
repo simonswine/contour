@@ -30,6 +30,7 @@ type CacheHandler struct {
 	ListenerCache
 	RouteCache
 	ClusterCache
+	AuthenticationCache
 
 	IngressRouteStatus *k8s.IngressRouteStatus
 	logrus.FieldLogger
@@ -49,6 +50,7 @@ func (ch *CacheHandler) OnChange(b *dag.Builder) {
 	ch.updateRoutes(dag)
 	ch.updateClusters(dag)
 	ch.updateIngressRouteMetric(dag)
+	ch.updateAuthentications(dag)
 }
 
 func (ch *CacheHandler) setIngressRouteStatus(st statusable) {
@@ -78,6 +80,11 @@ func (ch *CacheHandler) updateClusters(root dag.Visitable) {
 func (ch *CacheHandler) updateIngressRouteMetric(st statusable) {
 	metrics := calculateIngressRouteMetric(st)
 	ch.Metrics.SetIngressRouteMetric(metrics)
+}
+
+func (ch *CacheHandler) updateAuthentications(root dag.Visitable) {
+	authentications := visitAuthentications(root)
+	ch.AuthenticationCache.Update(authentications)
 }
 
 func calculateIngressRouteMetric(st statusable) metrics.IngressRouteMetric {

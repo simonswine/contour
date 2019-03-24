@@ -19,6 +19,7 @@ import (
 
 	"github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
 	"github.com/envoyproxy/go-control-plane/envoy/api/v2/route"
+	"github.com/envoyproxy/go-control-plane/pkg/util"
 	"github.com/gogo/protobuf/types"
 	"github.com/heptio/contour/internal/dag"
 )
@@ -137,6 +138,28 @@ func PrefixMatch(prefix string) route.RouteMatch {
 	}
 }
 
+// PerFilterConfig generated the authentication config per route
+func PerFilterConfig(r *dag.Route) map[string]*types.Struct {
+	fields := make(map[string]*types.Value)
+	if r.Authentication == nil {
+		// no authentication set
+		fields["disabled"] = bvv(true)
+	} else {
+		// set authentication context
+		fields["check_settings"] = st(map[string]*types.Value{
+			"context_extensions": st(map[string]*types.Value{
+				"authentication_name":      sv(r.Authentication.Name()),
+				"authentication_namespace": sv(r.Authentication.Namespace()),
+			}),
+		})
+	}
+	return map[string]*types.Struct{
+		util.ExternalAuthorization: &types.Struct{
+			Fields: fields,
+		},
+	}
+}
+
 // VirtualHost creates a new route.VirtualHost.
 func VirtualHost(hostname string, port int) route.VirtualHost {
 	domains := []string{hostname}
@@ -189,3 +212,7 @@ func bv(val bool) *types.BoolValue {
 }
 
 func duration(d time.Duration) *time.Duration { return &d }
+
+func bvv(b bool) *types.Value {
+	return &types.Value{Kind: &types.Value_BoolValue{BoolValue: b}}
+}

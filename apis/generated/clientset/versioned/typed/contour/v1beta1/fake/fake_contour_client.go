@@ -28,6 +28,10 @@ type FakeContourV1beta1 struct {
 	*testing.Fake
 }
 
+func (c *FakeContourV1beta1) Authentications(namespace string) v1beta1.AuthenticationInterface {
+	return &FakeAuthentications{c, namespace}
+}
+
 func (c *FakeContourV1beta1) IngressRoutes(namespace string) v1beta1.IngressRouteInterface {
 	return &FakeIngressRoutes{c, namespace}
 }

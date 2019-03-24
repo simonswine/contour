@@ -69,6 +69,8 @@ type Route struct {
 	PermitInsecure bool `json:"permitInsecure,omitempty"`
 	// Indicates that during forwarding, the matched prefix (or path) should be swapped with this value
 	PrefixRewrite string `json:"prefixRewrite,omitempty"`
+	// Authentication reference
+	AuthenticationRef LocalObjectReference `json:"authenticationRef,omitempty"`
 }
 
 // TCPProxy contains the set of services to proxy TCP connections.
@@ -100,45 +102,6 @@ type Delegate struct {
 	Name string `json:"name"`
 	// Namespace of the IngressRoute
 	Namespace string `json:"namespace,omitempty"`
-}
-
-// Authentication allows protecting certain routes
-type Authentication struct {
-	RequestService *AuthenticationRequestService
-	Basic          *AuthenticationBasic
-}
-
-type AuthenticationRequestService struct {
-	// URL defines the endpoint that every request's headers forwarded to.
-	// Can cluster internal or external URLs
-	URL string
-	// SignInURL defines the public reachable endpoint a user is redirect
-	// to, if the AuthURL is requesting htat
-	SignInURL string
-}
-
-// Basic is used to perform basic auth using a secret file
-type AuthenticationBasic struct {
-	// SecretRef references a htpasswd file stored in a secret object
-	SecretRef SecretKeySelector `json:"secretRef"`
-	// Realm contains the message to display with an appropiate context why the
-	// authentication is required
-	Realm string
-}
-
-type SecretKeySelector struct {
-	// The name of the secret in the objects's namespace to select from.
-	LocalObjectReference `json:",inline"`
-	// The key of the secret to select from. Must be a valid secret key.
-	// +optional
-	Key string `json:"key,omitempty"`
-}
-
-type LocalObjectReference struct {
-	// Name of the referent.
-	// More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-	// TODO: Add other useful fields. apiVersion, kind, uid?
-	Name string `json:"name"`
 }
 
 // HealthCheck defines optional healthchecks on the upstream service

@@ -46,6 +46,7 @@ var ingressrouteRootNamespaceFlag string
 
 func main() {
 	log := logrus.StandardLogger()
+	log.SetLevel(logrus.DebugLevel)
 	app := kingpin.New("contour", "Heptio Contour Kubernetes ingress controller.")
 	var config envoy.BootstrapConfig
 	bootstrap := app.Command("bootstrap", "Generate bootstrap configuration.")
@@ -177,6 +178,7 @@ func main() {
 		coreInformers.Core().V1().Secrets().Informer().AddEventHandler(&reh)
 		contourInformers.Contour().V1beta1().IngressRoutes().Informer().AddEventHandler(&reh)
 		contourInformers.Contour().V1beta1().TLSCertificateDelegations().Informer().AddEventHandler(&reh)
+		contourInformers.Contour().V1beta1().Authentications().Informer().AddEventHandler(&reh)
 
 		ch.IngressRouteStatus = &k8s.IngressRouteStatus{
 			Client: contourClient,
@@ -220,7 +222,7 @@ func main() {
 				routeType:    &ch.RouteCache,
 				listenerType: &ch.ListenerCache,
 				endpointType: et,
-			})
+			}, &ch.AuthenticationCache)
 			log.Println("started")
 			defer log.Println("stopped")
 			return s.Serve(l)

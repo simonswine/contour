@@ -1,0 +1,22 @@
+---
+apiVersion: contour.heptio.com/v1beta1
+kind: Authentication
+metadata:
+  name: kuard
+  namespace: default
+spec:
+  basic:
+    realm: Kuard - Top Secret
+    secretRef:
+      name: kuard-basic-auth
+      key: htpasswd
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: kuard-basic-auth
+  namespace: default
+stringData:
+  htpasswd: |
+    contour-md5:$apr1$CEjYbKlD$W6YQJdWU3o75pfuqAj/BO1
+    contour-bcrypt:$2y$05$IvbJIG8WiBD0NlokAdpCxO5dmJd0sVVi7xkP5/iEsIqpRzVeTh6WC

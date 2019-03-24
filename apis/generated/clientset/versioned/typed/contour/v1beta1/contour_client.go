@@ -27,6 +27,7 @@ import (
 
 type ContourV1beta1Interface interface {
 	RESTClient() rest.Interface
+	AuthenticationsGetter
 	IngressRoutesGetter
 	TLSCertificateDelegationsGetter
 }
@@ -34,6 +35,10 @@ type ContourV1beta1Interface interface {
 // ContourV1beta1Client is used to interact with features provided by the contour.heptio.com group.
 type ContourV1beta1Client struct {
 	restClient rest.Interface
+}
+
+func (c *ContourV1beta1Client) Authentications(namespace string) AuthenticationInterface {
+	return newAuthentications(c, namespace)
 }
 
 func (c *ContourV1beta1Client) IngressRoutes(namespace string) IngressRouteInterface {

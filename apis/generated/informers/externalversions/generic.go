@@ -53,6 +53,8 @@ func (f *genericInformer) Lister() cache.GenericLister {
 func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource) (GenericInformer, error) {
 	switch resource {
 	// Group=contour.heptio.com, Version=v1beta1
+	case v1beta1.SchemeGroupVersion.WithResource("authentications"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Contour().V1beta1().Authentications().Informer()}, nil
 	case v1beta1.SchemeGroupVersion.WithResource("ingressroutes"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Contour().V1beta1().IngressRoutes().Informer()}, nil
 	case v1beta1.SchemeGroupVersion.WithResource("tlscertificatedelegations"):

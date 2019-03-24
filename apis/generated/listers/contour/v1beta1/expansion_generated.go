@@ -18,6 +18,14 @@ limitations under the License.
 
 package v1beta1
 
+// AuthenticationListerExpansion allows custom methods to be added to
+// AuthenticationLister.
+type AuthenticationListerExpansion interface{}
+
+// AuthenticationNamespaceListerExpansion allows custom methods to be added to
+// AuthenticationNamespaceLister.
+type AuthenticationNamespaceListerExpansion interface{}
+
 // IngressRouteListerExpansion allows custom methods to be added to
 // IngressRouteLister.
 type IngressRouteListerExpansion interface{}

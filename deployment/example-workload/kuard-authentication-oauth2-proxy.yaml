@@ -1,0 +1,9 @@
+apiVersion: contour.heptio.com/v1beta1
+kind: Authentication
+metadata:
+  name: kuard
+  namespace: default
+spec:
+  requestService:
+    url: https://auth.swine.de/oauth2/auth
+    signInURL: https://auth.jetstack.net/oauth2/start

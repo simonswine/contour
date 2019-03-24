@@ -18,6 +18,8 @@ limitations under the License.
 
 package v1beta1
 
+type AuthenticationExpansion interface{}
+
 type IngressRouteExpansion interface{}
 
 type TLSCertificateDelegationExpansion interface{}

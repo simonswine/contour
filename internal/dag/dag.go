@@ -48,6 +48,34 @@ func (d *DAG) Statuses() []Status {
 	return d.statuses
 }
 
+type Authentication struct {
+	Object      *ingressroutev1.Authentication
+	BasicSecret *Secret
+}
+
+func (a *Authentication) Visit(f func(Vertex)) {
+	if a.BasicSecret != nil {
+		f(a.BasicSecret)
+	}
+}
+
+func (a *Authentication) Name() string      { return a.Object.Name }
+func (a *Authentication) Namespace() string { return a.Object.Namespace }
+
+func (a *Authentication) ToMeta() meta {
+	return meta{
+		name:      a.Name(),
+		namespace: a.Namespace(),
+	}
+}
+
+func (a *Authentication) toMeta() meta {
+	return meta{
+		name:      a.Name(),
+		namespace: a.Namespace(),
+	}
+}
+
 type Route struct {
 	Prefix       string
 	object       interface{} // one of Ingress or IngressRoute
@@ -81,6 +109,9 @@ type Route struct {
 
 	// Indicates that during forwarding, the matched prefix (or path) should be swapped with this value
 	PrefixRewrite string
+
+	// Authentication contains information about how to authenticate clients
+	Authentication *Authentication
 }
 
 func (r *Route) addHTTPService(s *HTTPService) {
@@ -93,6 +124,9 @@ func (r *Route) addHTTPService(s *HTTPService) {
 func (r *Route) Visit(f func(Vertex)) {
 	for _, c := range r.httpServices {
 		f(c)
+	}
+	if r.Authentication != nil {
+		f(r.Authentication)
 	}
 }
 
