@@ -50,7 +50,7 @@ rules:
   - list
   - watch
 - apiGroups: ["contour.heptio.com"]
-  resources: ["ingressroutes", "tlscertificatedelegations"]
+  resources: ["ingressroutes", "tlscertificatedelegations", "authentications"]
   verbs:
   - get
   - list
